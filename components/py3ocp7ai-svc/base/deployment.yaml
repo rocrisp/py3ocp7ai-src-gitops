@@ -5,12 +5,13 @@ metadata:
     tad.gitops.set/image: ".spec.template.spec.containers[0].image"
     tad.gitops.get/image: ".spec.template.spec.containers[0].image"
     tad.gitops.set/replicas: ".spec.replicas"
-    tad.gitops.get/replicas: ".spec.replicas" 
+    tad.gitops.get/replicas: ".spec.replicas"
+    sscs/source-url: "https://github.com/org4rong/py3ocp7-src"
   labels: 
     app.kubernetes.io/instance: py3ocp7ai-svc
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name:  py3ocp7ai-svc
-    app.kubernetes.io/part-of: py3ocp7ai-svc-gitops  
+    app.kubernetes.io/part-of: py3ocp7ai-svc-gitops
   name: py3ocp7ai-svc
 spec:
   replicas: 1
