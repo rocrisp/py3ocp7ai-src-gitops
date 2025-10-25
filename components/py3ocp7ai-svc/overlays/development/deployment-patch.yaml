@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
         - image: llamastack/distribution-starter:0.2.18
-          name: llamastack
+          name: llama-stack
 ---
 # Toolhive Operator Deployment
 apiVersion: apps/v1
