@@ -40,3 +40,4 @@ spec:
   port: 8000
   targetPort: 8000
   transport: sse
+  uri: "http://weather:8000/sse"
