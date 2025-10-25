@@ -1,0 +1,27 @@
+# This file grants the toolhive-operator the necessary cluster-wide permissions
+# to watch for and manage MCPServer resources and their sub-resources.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: toolhive-operator-cluster-permissions
+  labels:
+    app.kubernetes.io/name: toolhive-operator
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/managed-by: kustomize
+rules:
+  # Permission to manage the MCPServer custom resources themselves
+  - apiGroups: ["toolhive.stacklok.dev"]
+    resources: ["mcpservers", "mcpservers/status"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Permissions to manage the Deployments and Services created by the operator
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""] # Core API group
+    # This rule grants permissions for core resources, including pods
+    resources: ["services", "configmaps", "pods", "serviceaccounts"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Permissions for RBAC resources
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]

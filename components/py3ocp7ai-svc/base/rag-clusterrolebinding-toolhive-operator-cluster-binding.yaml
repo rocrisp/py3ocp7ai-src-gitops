@@ -1,0 +1,20 @@
+# Create the ClusterRoleBinding to link the ClusterRole to the operator's Service Account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: toolhive-operator-cluster-binding
+  labels:
+    app.kubernetes.io/name: toolhive-operator
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/managed-by: kustomize
+subjects:
+  # This is the Service Account for the toolhive-operator that needs the permissions
+  - kind: ServiceAccount
+    name: toolhive-operator
+    # Note: namespace will be set by Kustomize overlay
+roleRef:
+  # This links to the ClusterRole we created above
+  kind: ClusterRole
+  name: toolhive-operator-cluster-permissions
+  apiGroup: rbac.authorization.k8s.io
+

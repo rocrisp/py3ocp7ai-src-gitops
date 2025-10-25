@@ -12,8 +12,10 @@ resources:
   - service.yaml
   # Cluster-scoped resources (RBAC)
   - rag-clusterrole-toolhive-operator-manager-role.yaml
+  - rag-clusterrole-toolhive-operator-cluster-permissions.yaml
   - rag-clusterrolebinding-tssc-app-development-toolhive-operator-anyuid.yaml
   - rag-clusterrolebinding-toolhive-operator-manager-rolebinding.yaml
+  - rag-clusterrolebinding-toolhive-operator-cluster-binding.yaml
 
   # ConfigMaps
   - rag-configmap-pgvector-initsql.yaml
