@@ -66,6 +66,40 @@ tad set rag replicas 3
 tad set rag image quay.io/org4rong/rag-ui:v1.2.3
 ```
 
+## Prerequisites
+
+Before deploying the RAG application, you must install the required CRDs and grant ArgoCD permissions:
+
+### 1. Install Toolhive Operator CRDs
+
+The Toolhive operator requires CRDs to be installed first:
+
+```bash
+# Install Toolhive CRDs (latest version)
+helm upgrade -i toolhive-operator-crds oci://ghcr.io/stacklok/toolhive/toolhive-operator-crds
+
+# Or install a specific version
+helm upgrade -i toolhive-operator-crds oci://ghcr.io/stacklok/toolhive/toolhive-operator-crds --version 0.0.21
+```
+
+### 2. Grant ArgoCD Permissions for MCPServer CRDs
+
+ArgoCD Application Controller needs permission to deploy MCPServer resources:
+
+```bash
+# Apply ArgoCD RBAC (one-time, manual step)
+oc apply -f argocd-rbac/clusterrole-argocd-mcpserver.yaml
+oc apply -f argocd-rbac/clusterrolebinding-argocd-mcpserver.yaml
+```
+
+**Why?** ArgoCD needs permission to CREATE MCPServer CRDs. Without this, you'll get:
+```
+mcpservers.toolhive.stacklok.dev is forbidden: User "system:serviceaccount:tssc-gitops:..." 
+cannot create resource "mcpservers"
+```
+
+These permissions are in `argocd-rbac/` directory and must be applied before ArgoCD can sync the application.
+
 ## RBAC - Toolhive Operator Permissions
 
 The Toolhive operator requires **three different ClusterRoleBindings** for complete functionality:
