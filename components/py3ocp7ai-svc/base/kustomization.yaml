@@ -39,7 +39,7 @@ resources:
   - rag-job-upload-sample-docs-job.yaml
 
   # MCP Servers
-  - rag-mcpserver-oracle-sqlcl.yaml
+  # - rag-mcpserver-oracle-sqlcl.yaml  # Disabled - requires oracle23ai secret
   - rag-mcpserver-weather.yaml
 
   # Notebook
