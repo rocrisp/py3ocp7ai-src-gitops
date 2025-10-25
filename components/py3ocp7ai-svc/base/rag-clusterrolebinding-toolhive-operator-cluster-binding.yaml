@@ -11,10 +11,9 @@ subjects:
   # This is the Service Account for the toolhive-operator that needs the permissions
   - kind: ServiceAccount
     name: toolhive-operator
-    # Note: namespace will be set by Kustomize overlay
+    namespace: tssc-app-development
 roleRef:
   # This links to the ClusterRole we created above
   kind: ClusterRole
   name: toolhive-operator-cluster-permissions
   apiGroup: rbac.authorization.k8s.io
-

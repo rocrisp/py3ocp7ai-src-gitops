@@ -11,6 +11,6 @@ roleRef:
   kind: ClusterRole
   name: toolhive-operator-manager-role
 subjects:
-- kind: ServiceAccount
-  name: toolhive-operator
-  # namespace: tssc-app-development  # Managed by Kustomize overlay
+  - kind: ServiceAccount
+    name: toolhive-operator
+    namespace: tssc-app-development

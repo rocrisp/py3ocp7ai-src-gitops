@@ -8,9 +8,9 @@ metadata:
     app.kubernetes.io/instance: rag
     app.kubernetes.io/managed-by: kustomize
 subjects:
-- kind: ServiceAccount
-  name: toolhive-operator
-  # namespace: tssc-app-development  # Managed by Kustomize overlay
+  - kind: ServiceAccount
+    name: toolhive-operator
+    namespace: tssc-app-development
 roleRef:
   kind: ClusterRole
   name: system:openshift:scc:anyuid

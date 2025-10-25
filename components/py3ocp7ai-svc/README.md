@@ -66,6 +66,59 @@ tad set rag replicas 3
 tad set rag image quay.io/org4rong/rag-ui:v1.2.3
 ```
 
+## RBAC - Toolhive Operator Permissions
+
+The Toolhive operator requires **three different ClusterRoleBindings** for complete functionality:
+
+### ClusterRoleBinding Overview
+
+| ClusterRoleBinding                              | ClusterRole                             | Purpose                       | Required?                  |
+| ----------------------------------------------- | --------------------------------------- | ----------------------------- | -------------------------- |
+| `tssc-app-development-toolhive-operator-anyuid` | `system:openshift:scc:anyuid`           | Security Context Constraint   | ✅ Yes - OpenShift SCC      |
+| `toolhive-operator-manager-rolebinding`         | `toolhive-operator-manager-role`        | Operator lifecycle management | ✅ Yes - Leader election    |
+| `toolhive-operator-cluster-binding`             | `toolhive-operator-cluster-permissions` | MCPServer CRD management      | ✅ Yes - Core functionality |
+
+### Why You Need All Three:
+
+#### 1. **`*-anyuid`** (Security Context)
+```yaml
+ClusterRole: system:openshift:scc:anyuid
+```
+- **Purpose**: Grants OpenShift Security Context Constraint permissions
+- **What it does**: Allows toolhive-operator pod to run as any UID
+- **Why needed**: Flexibility to run workloads with different security contexts
+
+#### 2. **`*-manager-rolebinding`** (Operator Lifecycle)
+```yaml
+ClusterRole: toolhive-operator-manager-role
+```
+- **Purpose**: Standard Kubernetes operator management
+- **What it does**: Leader election, operator lifecycle management
+- **Why needed**: Multi-replica operator coordination
+
+#### 3. **`*-cluster-binding`** (MCPServer Management)
+```yaml
+ClusterRole: toolhive-operator-cluster-permissions
+```
+- **Purpose**: Manage MCPServer custom resources
+- **Permissions**:
+  - MCPServer CRDs (create, update, delete)
+  - Deployments, Services, ConfigMaps, Pods
+  - RBAC resources (Roles, RoleBindings)
+- **Why needed**: Core operator functionality - manages MCP servers
+
+### Important Notes:
+
+⚠️ **ClusterRoleBindings require namespace in subjects:**
+```yaml
+subjects:
+  - kind: ServiceAccount
+    name: toolhive-operator
+    namespace: tssc-app-development  # REQUIRED - cannot be omitted
+```
+
+This is a Kubernetes requirement for ClusterRoleBindings that reference ServiceAccounts.
+
 ## Secret Management
 
 All secrets are managed by **HashiCorp Vault** and synchronized using **External Secrets Operator**.
