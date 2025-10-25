@@ -1,0 +1,63 @@
+# Source: rag/charts/llm-service/templates/serving-runtime.yaml
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: vllm-serving-runtime-gpu
+  annotations:
+    openshift.io/display-name: vllm-serving-runtime-gpu
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/template-display-name: vLLM ServingRuntime for KServe (GPU)
+    opendatahub.io/template-name: vllm-runtime-gpu
+  labels:
+    opendatahub.io/dashboard: "true"
+    device: gpu
+spec:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+    serving.knative.dev/progress-deadline: 60m
+  containers:
+  - command:
+    - python3
+    - -m
+    - vllm.entrypoints.openai.api_server
+    args:
+    - --port
+    - "8080"
+    - --download-dir
+    - /vllm/model
+    env:
+    - name: HOME
+      value: /vllm
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: rag-huggingface-secret
+    image: quay.io/ecosystem-appeng/vllm:openai-v0.10.1
+    name: kserve-container
+    ports:
+    - containerPort: 8080
+      protocol: TCP
+    volumeMounts:
+    - mountPath: /dev/shm
+      name: shm
+    - mountPath: /chat-templates
+      name: vllm-chat-templates
+    - mountPath: /vllm
+      name: vllm-home
+  multiModel: false
+  supportedModelFormats:
+  - autoSelect: true
+    name: vLLM
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 2Gi
+      name: shm
+    - configMap:
+        name: vllm-chat-templates
+      name: vllm-chat-templates
+    - emptyDir: {}
+      name: vllm-home

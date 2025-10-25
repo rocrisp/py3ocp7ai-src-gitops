@@ -1,0 +1,81 @@
+# Source: rag/charts/pgvector/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rag-pgvector
+  labels:
+    app.kubernetes.io/name: rag-pgvector
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rag-pgvector
+      app.kubernetes.io/instance: rag
+  volumeClaimTemplates:
+    - metadata:
+        name: pg-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rag-pgvector
+        app.kubernetes.io/instance: rag
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: kustomize
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: rag-pgvector
+          image: "docker.io/pgvector/pgvector:pg17"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: rag-pgvector
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: rag-pgvector
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: rag-pgvector
+            - name: POSTGRES_DBNAME
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: rag-pgvector
+          ports:
+            - name: http
+              containerPort: 5432
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  for db in "$POSTGRES_DBNAME"; do
+                    pg_isready -U "$POSTGRES_USER" -d "$db" -h 127.0.0.1 -p "$POSTGRES_PORT" || exit 1
+                  done
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: initdb-volume
+            - mountPath: /var/lib/postgresql
+              name: pg-data
+      volumes:
+        - name: initdb-volume
+          configMap:
+            name: pgvector-initsql

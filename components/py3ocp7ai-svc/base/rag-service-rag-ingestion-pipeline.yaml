@@ -1,0 +1,21 @@
+# Source: rag/charts/ingestion-pipeline/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-ingestion-pipeline
+  labels:
+    pipelines.kubeflow.org/v2_component: 'true'
+    app.kubernetes.io/name: ingestion-pipeline
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.2.18"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: ingestion-pipeline
+    app.kubernetes.io/instance: rag

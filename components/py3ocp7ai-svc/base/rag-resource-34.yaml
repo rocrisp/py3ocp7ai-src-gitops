@@ -1,0 +1,2 @@
+# Source: rag/charts/configure-pipeline/templates/pipeline-ingestion-secret.yaml
+# This secret will be used by the rag-pipeline-notebook

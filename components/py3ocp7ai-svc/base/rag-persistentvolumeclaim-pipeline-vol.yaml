@@ -1,0 +1,12 @@
+# Source: rag/charts/configure-pipeline/templates/notebook-pvc.yaml
+# This pvc will be used by the rag-pipeline-notebook
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipeline-vol
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

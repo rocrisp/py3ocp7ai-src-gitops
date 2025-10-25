@@ -1,0 +1,20 @@
+# Source: rag/charts/pgvector/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-pgvector
+  labels:
+    app.kubernetes.io/name: rag-pgvector
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: rag-pgvector
+    app.kubernetes.io/instance: rag

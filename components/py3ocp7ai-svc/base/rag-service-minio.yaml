@@ -1,0 +1,24 @@
+# Source: rag/charts/minio/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-minio
+  labels:
+    app.kubernetes.io/name: rag-minio
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: webui
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: api
+  selector:
+    app.kubernetes.io/name: rag-minio
+    app.kubernetes.io/instance: rag

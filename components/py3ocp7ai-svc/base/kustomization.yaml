@@ -1,12 +1,80 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-commonLabels:         
+commonLabels:
   argocd/app-name: py3ocp7ai-svc
   janus-idp.io/tekton: py3ocp7ai-svc
   backstage.io/kubernetes-id: py3ocp7ai-svc
-  backstage.io/kubernetes-namespace: tssc-app 
+  backstage.io/kubernetes-namespace: tssc-app
   app.kubernetes.io/part-of: py3ocp7ai-svc
 resources:
   - deployment.yaml
   - route.yaml
   - service.yaml
+  # Cluster-scoped resources (RBAC)
+  - rag-clusterrole-toolhive-operator-manager-role.yaml
+  - rag-clusterrolebinding-tssc-app-development-toolhive-operator-anyuid.yaml
+  - rag-clusterrolebinding-toolhive-operator-manager-rolebinding.yaml
+
+  # ConfigMaps
+  - rag-configmap-pgvector-initsql.yaml
+  - rag-configmap-run-config.yaml
+  - rag-configmap-vllm-chat-templates.yaml
+
+  # Data Science Pipelines
+  - rag-datasciencepipelinesapplication-dspa.yaml
+
+  # Deployments
+  - rag-deployment-rag-ingestion-pipeline.yaml
+  - rag-deployment-rag.yaml
+  - rag-deployment-llamastack.yaml
+  - rag-deployment-toolhive-operator.yaml
+
+  # InferenceService (KServe)
+  - rag-inferenceservice-llama-3-2-3b-instruct.yaml
+
+  # Jobs
+  - rag-job-add-default-ingestion-pipeline.yaml
+  - rag-job-upload-sample-docs-job.yaml
+
+  # MCP Servers
+  - rag-mcpserver-oracle-sqlcl.yaml
+  - rag-mcpserver-weather.yaml
+
+  # Notebook
+  - rag-notebook-rag-pipeline-notebook.yaml
+
+  # PersistentVolumeClaims
+  - rag-persistentvolumeclaim-llama-stack-data.yaml
+  - rag-persistentvolumeclaim-pipeline-vol.yaml
+
+  # Other Resources
+  - rag-resource-34.yaml
+
+  # RBAC (Namespace-scoped)
+  - rag-role-secret-writer.yaml
+  - rag-role-toolhive-operator-leader-election-role.yaml
+  - rag-rolebinding-secret-writer-binding.yaml
+  - rag-rolebinding-toolhive-operator-leader-election-rolebinding.yaml
+
+  # Routes
+  - rag-route-rag.yaml
+  - rag-route-minio-api.yaml
+  - rag-route-minio-webui.yaml
+
+  # Services
+  - rag-service-rag-ingestion-pipeline.yaml
+  - rag-service-rag.yaml
+  - rag-service-llamastack.yaml
+  - rag-service-minio.yaml
+  - rag-service-pgvector.yaml
+
+  # ServiceAccounts
+  - rag-serviceaccount-rag-ingestion-pipeline.yaml
+  - rag-serviceaccount-toolhive-operator.yaml
+
+  # ServingRuntime
+  - rag-servingruntime-vllm-serving-runtime-gpu.yaml
+
+  # StatefulSets
+  - rag-statefulset-minio.yaml
+  - rag-statefulset-pgvector.yaml

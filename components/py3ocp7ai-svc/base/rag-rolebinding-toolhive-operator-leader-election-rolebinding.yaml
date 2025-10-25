@@ -1,0 +1,20 @@
+# Source: rag/charts/mcp-servers/charts/toolhive-operator/templates/leader-election-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: toolhive-operator-leader-election-rolebinding
+  # namespace: tssc-app-development  # Managed by Kustomize overlay
+  labels:
+    app.kubernetes.io/name: toolhive-operator
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/part-of: toolhive-operator
+    app.kubernetes.io/version: "0.3.5"
+    app.kubernetes.io/managed-by: kustomize
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: toolhive-operator-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: toolhive-operator
+  # namespace: tssc-app-development  # Managed by Kustomize overlay

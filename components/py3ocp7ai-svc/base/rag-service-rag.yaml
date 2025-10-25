@@ -1,0 +1,20 @@
+# Source: rag/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag
+  labels:
+    app.kubernetes.io/name: rag
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.2.14"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8501
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: rag
+    app.kubernetes.io/instance: rag

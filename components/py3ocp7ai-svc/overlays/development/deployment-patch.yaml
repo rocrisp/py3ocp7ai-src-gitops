@@ -14,3 +14,75 @@ spec:
       containers:
         - image: quay.io/org4rong/py3ocp7ai-img:ea824a0cd53d91e141651a8a4258c0a1d1002de9@sha256:b937dfa3737b801bf9453122a881a4b2bed2b656992ceb31d75d6032c864cbd6
           name: container-image
+---
+# RAG UI Ingestion Pipeline Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  name: rag-ingestion-pipeline
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - image: quay.io/ecosystem-appeng/ingestion-pipeline:0.2.18
+          name: ingestion-pipeline
+---
+# RAG UI Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  name: rag
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - image: quay.io/ecosystem-appeng/llamastack-dist-ui:0.2.9
+          name: rag-ui
+---
+# LlamaStack Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  name: llamastack
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - image: llamastack/distribution-starter:0.2.18
+          name: llamastack
+---
+# Toolhive Operator Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  name: toolhive-operator
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - image: ghcr.io/stacklok/toolhive/operator:v0.3.5
+          name: manager

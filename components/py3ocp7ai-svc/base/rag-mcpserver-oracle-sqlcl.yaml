@@ -1,0 +1,83 @@
+# Source: rag/charts/mcp-servers/templates/mcpserver.yaml
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: oracle-sqlcl
+  labels:
+    app.kubernetes.io/name: oracle-sqlcl
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  image: "quay.io/ecosystem-appeng/oracle-sqlcl:0.1.0"
+  permissionProfile:
+    name: network
+    type: builtin
+  podTemplateSpec:
+    metadata: {}
+    spec:
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: sqlcl-data
+        ephemeral:
+          volumeClaimTemplate:
+            metadata:
+              labels:
+                app.kubernetes.io/name: oracle-sqlcl
+                app.kubernetes.io/instance: rag
+                app.kubernetes.io/version: "0.1.0"
+                app.kubernetes.io/managed-by: kustomize
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+              storageClassName: gp3-csi
+      containers:
+      - name: mcp
+        image: "quay.io/ecosystem-appeng/oracle-sqlcl:0.1.0"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HOME
+          value: "/sqlcl-home"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-Djava.io.tmpdir=/sqlcl-home/tmp"
+        - name: ORACLE_CONN_NAME
+          value: "oracle_connection"
+        - name: ORACLE_USER
+          value: "sales"
+        - name: _JAVA_OPTIONS
+          value: ""
+        - name: ORACLE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: oracle23ai
+              key: jdbc-uri
+        - name: ORACLE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: oracle23ai
+              key: password
+        volumeMounts:
+        - mountPath: /sqlcl-home
+          name: sqlcl-data
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+  port: 8080
+  transport: stdio

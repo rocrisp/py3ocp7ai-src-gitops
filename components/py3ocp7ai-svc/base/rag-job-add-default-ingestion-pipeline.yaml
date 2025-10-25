@@ -1,0 +1,37 @@
+# Source: rag/charts/ingestion-pipeline/templates/default-pipeline-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-default-ingestion-pipeline
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: wait-for-pipeline
+          image: "image-registry.openshift-image-registry.svc:5000/openshift/tools:latest"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              url="http://rag-ingestion-pipeline/ping"
+              echo "Waiting for $url..."
+              until curl -ksf "$url"; do
+                echo "Still waiting for $url ..."
+                sleep 10
+              done
+              echo "Ingestion pipeline service ready"
+      containers:
+        - name: create-ingestion-pipeline
+          image: "image-registry.openshift-image-registry.svc:5000/openshift/tools:latest"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              curl -sfX 'POST' \
+              'http://rag-ingestion-pipeline/add' \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d '{"access_key_id":"minio_rag_user","bucket_name":"documents","embedding_model":"all-MiniLM-L6-v2","endpoint_url":"http://minio:9000","name":"zippity-zoo-vector-db","region":"us-east-1","secret_access_key":"minio_rag_password","source":"S3","vector_db_name":"demo-rag-vector-db-v1-0-s3","version":"1.0"}'
+      restartPolicy: Never

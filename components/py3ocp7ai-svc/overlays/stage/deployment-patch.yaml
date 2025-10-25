@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata:   
-  annotations:  
+metadata:
+  annotations:
     tad.gitops.set/image: ".spec.template.spec.containers[0].image"
     tad.gitops.get/image: ".spec.template.spec.containers[0].image"
     tad.gitops.set/replicas: ".spec.replicas"
-    tad.gitops.get/replicas: ".spec.replicas" 
+    tad.gitops.get/replicas: ".spec.replicas"
   name: py3ocp7ai-svc
 spec:
-  replicas: 1 
-  template: 
+  replicas: 1
+  template:
     spec:
       containers:
-      - image: quay.io/org4rong/py3ocp7ai-img:ea824a0cd53d91e141651a8a4258c0a1d1002de9@sha256:b937dfa3737b801bf9453122a881a4b2bed2b656992ceb31d75d6032c864cbd6
-        name: container-image  
+        - image: quay.io/org4rong/py3ocp7ai-img:ea824a0cd53d91e141651a8a4258c0a1d1002de9@sha256:b937dfa3737b801bf9453122a881a4b2bed2b656992ceb31d75d6032c864cbd6
+          name: container-image

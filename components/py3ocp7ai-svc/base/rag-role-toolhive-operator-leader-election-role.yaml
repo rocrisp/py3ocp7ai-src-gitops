@@ -1,0 +1,44 @@
+# Source: rag/charts/mcp-servers/charts/toolhive-operator/templates/leader-election-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: toolhive-operator-leader-election-role
+  # namespace: tssc-app-development  # Managed by Kustomize overlay
+  labels:
+    app.kubernetes.io/name: toolhive-operator
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/part-of: toolhive-operator
+    app.kubernetes.io/version: "0.3.5"
+    app.kubernetes.io/managed-by: kustomize
+rules:
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+  - apiGroups:
+    - coordination.k8s.io
+    resources:
+    - leases
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+  - apiGroups:
+    - ""
+    resources:
+    - events
+    verbs:
+    - create
+    - patch

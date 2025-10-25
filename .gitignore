@@ -1,0 +1,28 @@
+# Helm values files with secrets
+components/*/helm-values/*-values.yaml
+components/*/helm-values/base-values.yaml
+
+# Keep example/template files
+!components/*/helm-values/*.yaml.example
+
+# RAG secret manifests (contain sensitive data)
+**/rag-secret-*.yaml
+
+# Keep example/template secret files if any
+!**/rag-secret-*.yaml.example
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+

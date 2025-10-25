@@ -1,0 +1,42 @@
+# Source: rag/charts/mcp-servers/templates/mcpserver.yaml
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: weather
+  labels:
+    app.kubernetes.io/name: weather
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  image: "quay.io/ecosystem-appeng/mcp-weather:0.1.0"
+  permissionProfile:
+    name: network
+    type: builtin
+  podTemplateSpec:
+    metadata: {}
+    spec:
+      serviceAccountName: default
+      volumes:
+      containers:
+      - name: mcp
+        image: "quay.io/ecosystem-appeng/mcp-weather:0.1.0"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TAVILY_API_KEY
+          value: "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"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+  port: 8000
+  targetPort: 8000
+  transport: sse

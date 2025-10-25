@@ -1,0 +1,130 @@
+# Source: rag/charts/llama-stack/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  labels:
+    app.kubernetes.io/name: llamastack
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.2.18"
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: py3ocp7ai-svc-gitops
+  name: llamastack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llamastack
+      app.kubernetes.io/instance: rag
+  strategy:
+    type: Recreate
+  progressDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llamastack
+        app.kubernetes.io/instance: rag
+        app.kubernetes.io/version: "0.2.18"
+        app.kubernetes.io/managed-by: kustomize
+    spec:
+      serviceAccountName: default
+      securityContext: {}
+      initContainers:
+        - name: wait-for-models
+          image: "llamastack/distribution-starter:0.2.18"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              for url_data in http://llama-3-2-3b-instruct-predictor:8080/v1/models# ; do
+                url_components=(${url_data//#/ })
+                url=${url_components[0]}
+                auth=${url_components[1]}
+                echo "Waiting for $url..."
+                curl_options=("-ksf" "$url")
+                if [[ -n "$auth" ]]; then
+                  curl_options+=("-H" "Authorization: Bearer $auth")
+                fi
+                until curl "${curl_options[@]}"; do
+                  echo "Still waiting for $url ..."
+                  sleep 10
+                done
+                echo "$url is ready."
+              done
+              echo "All services are up."
+      containers:
+        - name: llama-stack
+          securityContext: {}
+          image: "llamastack/distribution-starter:0.2.18"
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - -m
+            - llama_stack.core.server.server
+            - /app-config/config.yaml
+          env:
+            - name: VLLM_MAX_TOKENS
+              value: "4096"
+            - name: VLLM_API_TOKEN
+              value: fake
+            - name: OTEL_ENDPOINT
+              value: http://otel-collector-collector.observability-hub.svc.cluster.local:4318/v1/traces
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: rag-pgvector
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: rag-pgvector
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: rag-pgvector
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: rag-pgvector
+            - name: POSTGRES_DBNAME
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: rag-pgvector
+            - name: TAVILY_SEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rag-llama-stack-env
+                  key: TAVILY_SEARCH_API_KEY
+          ports:
+            - name: http
+              containerPort: 8321
+              protocol: TCP
+          livenessProbe: null
+          readinessProbe: null
+          resources: {}
+          volumeMounts:
+            - mountPath: /app-config
+              name: run-config-volume
+            - mountPath: /.llama
+              name: dot-llama
+            - mountPath: /.cache
+              name: cache
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: run-config
+          name: run-config-volume
+        - name: dot-llama
+          persistentVolumeClaim:
+            claimName: llama-stack-data
+        - emptyDir: {}
+          name: cache

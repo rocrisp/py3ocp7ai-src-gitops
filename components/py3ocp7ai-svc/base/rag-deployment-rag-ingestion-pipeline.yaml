@@ -1,0 +1,85 @@
+# Source: rag/charts/ingestion-pipeline/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    tad.gitops.set/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.get/image: ".spec.template.spec.containers[0].image"
+    tad.gitops.set/replicas: ".spec.replicas"
+    tad.gitops.get/replicas: ".spec.replicas"
+  labels:
+    pipelines.kubeflow.org/v2_component: "true"
+    app.kubernetes.io/name: ingestion-pipeline
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "0.2.18"
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: py3ocp7ai-svc-gitops
+  name: rag-ingestion-pipeline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingestion-pipeline
+      app.kubernetes.io/instance: rag
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        pipelines.kubeflow.org/v2_component: "true"
+        app.kubernetes.io/name: ingestion-pipeline
+        app.kubernetes.io/instance: rag
+        app.kubernetes.io/version: "0.2.18"
+        app.kubernetes.io/managed-by: kustomize
+    spec:
+      serviceAccountName: rag-ingestion-pipeline
+      securityContext: {}
+      initContainers:
+        - name: wait-for-services
+          image: "image-registry.openshift-image-registry.svc:5000/openshift/tools:latest"
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              url="https://ds-pipeline-dspa:8888/apis/v2beta1/healthz"
+              echo "Waiting for $url..."
+              until curl -ksf "$url"; do
+                echo "Still waiting for $url ..."
+                sleep 10
+              done
+              echo "Data science pipeline configured"
+
+              url="http://llamastack:8321/v1/models"
+              if [ ! -z ${LLAMA_STACK_AUTH_USER} ]; then
+                headers="-H \"X-Forwarded-User: ${LLAMA_STACK_AUTH_USER}\" -H \"Authorization: Bearer \$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\""
+              fi
+              echo "Waiting for $url..."
+              command="curl -ksf "$url" $headers"
+              echo $command
+              until $(command); do
+                echo "Still waiting for $url ..."
+                sleep 10
+              done
+              echo "Llama Stack server is running"
+      containers:
+        - name: ingestion-pipeline
+          securityContext: {}
+          image: "quay.io/ecosystem-appeng/ingestion-pipeline:0.2.18"
+          imagePullPolicy: Always
+          env:
+            - name: INGESTION_PIPELINE_IMAGE
+              value: "quay.io/ecosystem-appeng/ingestion-pipeline:0.2.18"
+            - name: LLAMASTACK_BASE_URL
+              value: "http://llamastack:8321"
+            - name: DS_PIPELINE_URL
+              value: "https://ds-pipeline-dspa:8888"
+            - name: SIGN_DATABASE
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe: null
+          readinessProbe: null
+          resources: {}

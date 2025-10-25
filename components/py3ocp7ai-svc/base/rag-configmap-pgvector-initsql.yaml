@@ -1,0 +1,16 @@
+# Source: rag/charts/pgvector/templates/configmap.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pgvector-initsql
+  labels:
+    app.kubernetes.io/name: rag-pgvector
+    app.kubernetes.io/instance: rag
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: kustomize
+data:
+  init-db.sh: |
+    #!/bin/bash
+    set -e
+    psql -U postgres -c "CREATE DATABASE ${POSTGRES_DBNAME};"
+    psql -U postgres -d ${POSTGRES_DBNAME} -c "CREATE EXTENSION VECTOR;"
