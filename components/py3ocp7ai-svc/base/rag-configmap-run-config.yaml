@@ -147,4 +147,4 @@ data:
     - toolgroup_id: mcp::weather
       provider_id: model-context-protocol
       mcp_endpoint:
-        uri: http://weather:8000/sse
+        uri: http://mcp-weather-proxy:8000/sse
