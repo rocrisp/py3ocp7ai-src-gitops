@@ -24,7 +24,10 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: TAVILY_API_KEY
-              value: "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"
+              valueFrom:
+                secretKeyRef:
+                  name: rag-tavily-secret
+                  key: TAVILY_API_KEY
           resources:
             limits:
               cpu: 500m
