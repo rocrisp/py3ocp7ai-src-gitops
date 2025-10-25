@@ -120,7 +120,7 @@ spec:
             - -c
             - |
               set -e
-              url="http://minio:9000/minio/health/live"
+              url="http://rag-minio:9000/minio/health/live"
               echo "Waiting for $url..."
               until curl -ksf "$url"; do
                 echo "Still waiting for $url ..."
