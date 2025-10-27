@@ -95,6 +95,26 @@ spec:
           command:
             - /bin/bash
           env:
+            - name: host
+              valueFrom:
+                secretKeyRef:
+                  name: rag-minio
+                  key: host
+            - name: port
+              valueFrom:
+                secretKeyRef:
+                  name: rag-minio
+                  key: port
+            - name: user
+              valueFrom:
+                secretKeyRef:
+                  name: rag-minio
+                  key: user
+            - name: password
+              valueFrom:
+                secretKeyRef:
+                  name: rag-minio
+                  key: password
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
