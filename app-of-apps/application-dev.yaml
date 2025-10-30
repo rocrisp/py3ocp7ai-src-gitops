@@ -14,9 +14,10 @@ spec:
     namespace: tssc-app-development
     server: https://kubernetes.default.svc
   ignoreDifferences:
-    # Ignore all PVCs auto-created by StatefulSets
+    # Ignore PVCs auto-created by StatefulSets only
     - group: ""
       kind: PersistentVolumeClaim
+      nameRegex: "^(minio-data-.*|.*-pgvector-data-.*)"
       jsonPointers:
         - /status
         - /metadata
