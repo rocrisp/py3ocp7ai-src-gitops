@@ -18,9 +18,9 @@ spec:
     spec:
       serviceAccountName: default
       volumes:
-      - name: weather-data
-        persistentVolumeClaim:
-          claimName: weather-data
+        - name: weather-data
+          persistentVolumeClaim:
+            claimName: weather-data
       containers:
         - name: mcp
           image: "quay.io/ecosystem-appeng/mcp-weather:0.1.0"
