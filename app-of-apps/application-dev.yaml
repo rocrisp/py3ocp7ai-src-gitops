@@ -13,6 +13,22 @@ spec:
   destination:
     namespace: tssc-app-development
     server: https://kubernetes.default.svc
+  ignoreDifferences:
+    # Ignore PVCs auto-created by StatefulSets
+    - group: ""
+      kind: PersistentVolumeClaim
+      name: minio-data-rag-minio-0
+      jsonPointers:
+        - /status
+        - /metadata/labels
+        - /metadata/annotations
+    - group: ""
+      kind: PersistentVolumeClaim
+      name: rag-pgvector-data-rag-pgvector-0
+      jsonPointers:
+        - /status
+        - /metadata/labels
+        - /metadata/annotations
   syncPolicy:
     managedNamespaceMetadata:
       labels: 
