@@ -35,7 +35,7 @@ resources:
   - rag-inferenceservice-llama-3-2-3b-instruct.yaml
 
   # Jobs
-  - rag-job-add-default-ingestion-pipeline.yaml
+  # - rag-job-add-default-ingestion-pipeline.yaml  # Disabled - optional setup job, can be done manually
   - rag-job-upload-sample-docs-job.yaml
 
   # MCP Servers
