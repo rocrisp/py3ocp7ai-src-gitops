@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: py3ocp7ai-svc-development
   namespace: tssc-gitops
-  finalizers: ["resources-finalizer.argocd.argoproj.io"] 
+  finalizers: ["resources-finalizer.argocd.argoproj.io"]
 spec:
   project: default
   source:
@@ -14,26 +14,24 @@ spec:
     namespace: tssc-app-development
     server: https://kubernetes.default.svc
   ignoreDifferences:
-    # Ignore PVCs auto-created by StatefulSets
+    # Ignore all PVCs auto-created by StatefulSets (using name patterns)
     - group: ""
       kind: PersistentVolumeClaim
-      name: minio-data-rag-minio-0
+      nameRegex: "^minio-data-.*"
       jsonPointers:
         - /status
-        - /metadata/labels
-        - /metadata/annotations
+        - /metadata
     - group: ""
-      kind: PersistentVolumeClaim
-      name: rag-pgvector-data-rag-pgvector-0
+      kind: PersistentVolumeClaim  
+      nameRegex: "^.*pgvector-data-.*"
       jsonPointers:
         - /status
-        - /metadata/labels
-        - /metadata/annotations
+        - /metadata
   syncPolicy:
     managedNamespaceMetadata:
-      labels: 
+      labels:
         argocd.argoproj.io/managed-by: tssc-gitops
-    automated: 
+    automated:
       prune: true
       selfHeal: true
     syncOptions:
